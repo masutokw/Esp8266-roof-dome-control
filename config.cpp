@@ -9,15 +9,28 @@ void read_config(void)
   File f = SPIFFS.open("/roof.cfg", "r");
   if (f)
   { String  s = f.readStringUntil('\n');
+   s.trim();
     n = s.toInt();
-    maxcounter = n < 100 ? n : 14900;
+    Serial.println(s);
+    
+    maxcounter = n > 100 ? n : 14900;
+    Serial.println(maxcounter);
     s = f.readStringUntil('\n');
+    s.trim();
     n = s.toInt();
-    maxspeed = n < 100 ? n : 1000;
+    maxspeed = n > 100 ? n : 1000;
+    s = f.readStringUntil('\n');
+    s.trim();
+    n = s.toInt();
+    acceleration = n > 1 ? n :1;
+    s = f.readStringUntil('\n');
+    s.trim();
+    n = s.toInt();
+    lowspeed = n > 100 ? n : 500;
     f.close();
   }
   else {
-    SPIFFS.format();
+    //SPIFFS.format();
   }
 }
 void save_config(void)

@@ -1,6 +1,7 @@
 #ifndef WEBSERVER_H_INCLUDED
 #define WEBSERVER_H_INCLUDED
 #include <ESP8266WebServer.h>
+#include "config.h"
 extern String ssid;
 extern String password ;
 #define BUTT ".button_red {text-align: right; background-color:#100000;color:yellow;border-color:red; border-radius:5px}"
