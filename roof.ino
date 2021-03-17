@@ -39,6 +39,7 @@ int sync_home = 0;
 Ticker speed_control_tckr, counters_poll_tkr;
 ESP8266WebServer serverweb(WEB_PORT);
 ESP8266HTTPUpdateServer httpUpdater;
+
 //String ssid = "MyWifi";
 //String password = "Mypass";
 uint32_t usToTicks(uint32_t us)

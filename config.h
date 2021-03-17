@@ -9,6 +9,8 @@
 #define HOME_SW D6
 #define FULL_SW D7
 #define IR_INPUT D3
+//#define DHTTYPE DHT11 // DHT Shield uses DHT 11
+#define DHTPIN D0 // DHT Shield uses pin D4
 extern  int maxspeed ,maxcounter,acceleration,lowspeed;
 extern String ssid;
 extern String password ;

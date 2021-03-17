@@ -1,17 +1,29 @@
 #include "web.h"
 #include "config.h"
 #include <FS.h>
-extern   int target, counter, maxcounter, maxspeed, acceleration, mspeed,lowspeed;
+#ifdef DHTTYPE
+#include <DHT.h>
+DHT dht(DHTPIN, DHTTYPE);
+#endif
+extern   int target, counter, maxcounter, maxspeed, acceleration, mspeed, lowspeed;
 extern uint32_t truecode;
 void handleconfig(void)
-{
+{ 
+  #ifdef DHTTYPE
+  float humidity, temperature;
+  humidity = dht.readHumidity();
+  temperature = dht.readTemperature();
+  #endif
   String content =  "<html><head> <meta http-equiv='refresh' content='3'><style>" + String(BUTT) + String(TEXTT) + "</style>" + String(AUTO_SIZE) + " </head><body  bgcolor=\"#000000\" text=\"#FF6000\"><h2>Techo</h2>";
   content += "<fieldset style=\"width:15%;border-radius:15px\"><legend>Estado</legend>";
   content += "<h3>Posicion : " + String(counter) + "  " + String(mspeed) + "</h3>";
+ #ifdef DHTTYPE
+ content += "<h3>Temperatura : " + String(temperature) + "  " + String(humidity) + "</h3>";
+ #endif
   content += "Techo : " + String(counter > 0 ? "Abierto" : "Cerrado") + "<br>";
   content += "Home : " + String(digitalRead(HOME_SW)  ? "Abierto" : "Cerrado") + "<br>";
   content += "End : " + String(digitalRead(FULL_SW)  ? "Abierto" : "Cerrado") + "<br>";
-   content += "Ir code : " + String(truecode) + "<br><table style='width:200px'>";
+  content += "Ir code : " + String(truecode) + "<br><table style='width:200px'>";
   content += "<button onclick=\"location.href='/close?DEST=" + String(maxcounter) + "'\" class=\"button_red\" type=\"button\">Open</button>";
   content += "<button onclick=\"location.href='/close?DEST=0'\" class=\"button_red\" type=\"button\">Close</button>";
   content += "<button onclick=\"location.href='/dome'\" class=\"button_red\" type=\"button\">Dome</button>";
@@ -26,13 +38,13 @@ void handleconfig(void)
 }
 void handleOpen(void)
 {
- // if (mspeed < 0)
- //   target = counter - (3 * (mspeed));
- // else
-    //target = counter ;
-    //hard_stop();
-   // counter=0;
-find_home();
+  // if (mspeed < 0)
+  //   target = counter - (3 * (mspeed));
+  // else
+  //target = counter ;
+  //hard_stop();
+  // counter=0;
+  find_home();
   String content =  "<html><head> <meta http-equiv='refresh' content=\"1;url=/\"><style>" + String(BUTT) + String(TEXTT) + "</style>" + String(AUTO_SIZE) + "</head><body  bgcolor=\"#000000\" text=\"#FF6000\"><h2>Apertura</h2><br>";
   content += "Estado : " + String(target) + "<br>";
   content += "<button onclick=\"location.href='/close'\" class=\"button_red\" type=\"button\">close</button><br><br>";
@@ -142,7 +154,7 @@ void handleConf( void) {
   String  ip, mask, gate, dns, net;
   if (serverweb.hasArg("MAXCOUNT") && serverweb.hasArg("ACCEL") && serverweb.hasArg("MAX_SPEED") && serverweb.hasArg("LOW_SPEED") )
   {
-    net = serverweb.arg("MAXCOUNT") + "\n" + serverweb.arg("MAX_SPEED") + "\n" + serverweb.arg("ACCEL") + "\n"+serverweb.arg("LOW_SPEED") + "\n";
+    net = serverweb.arg("MAXCOUNT") + "\n" + serverweb.arg("MAX_SPEED") + "\n" + serverweb.arg("ACCEL") + "\n" + serverweb.arg("LOW_SPEED") + "\n";
     File f = SPIFFS.open("/roof.cfg", "w");
     if (!f)
     {
