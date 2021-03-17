@@ -12,7 +12,7 @@
 #endif
 #include "web.h"
 #include <Ticker.h>
-#include "wifipass.h"
+//#include "wifipass.h"
 #define SPEED_CONTROL_TICKER 10
 #define COUNTERS_POLL_TICKER 20
 #define WEB_PORT 80
@@ -40,8 +40,8 @@ Ticker speed_control_tckr, counters_poll_tkr;
 ESP8266WebServer serverweb(WEB_PORT);
 ESP8266HTTPUpdateServer httpUpdater;
 
-//String ssid = "MyWifi";
-//String password = "Mypass";
+String ssid = "MyWifi";
+String password = "Mypass";
 uint32_t usToTicks(uint32_t us)
 {
   return (5 * us);     // converts microseconds to tick
