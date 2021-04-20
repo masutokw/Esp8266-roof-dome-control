@@ -9,9 +9,9 @@
 #define HOME_SW D6
 #define FULL_SW D7
 #define IR_INPUT D3
-//#define DHTTYPE DHT11 // DHT Shield uses DHT 11
-#define DHTPIN D0 // DHT Shield uses pin D4
-extern  int maxspeed ,maxcounter,acceleration,lowspeed;
+#define DHTTYPE DHT11 // DHT Shield uses DHT 11
+#define DHTPIN D4 // DHT Shield uses pin D4
+extern  int maxspeed ,maxcounter,acceleration,lowspeed,sync_home,select_speed;
 extern String ssid;
 extern String password ;
 void initFS(void);
@@ -19,5 +19,6 @@ void read_config(void);
 void save_config(void);
 void read_net(void);
 void hard_stop(void);
+void soft_stop(int k);
 void find_home(void);
 #endif

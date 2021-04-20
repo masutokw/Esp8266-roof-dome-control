@@ -28,6 +28,7 @@ void read_config(void)
     n = s.toInt();
     lowspeed = n > 100 ? n : 500;
     f.close();
+   if (sync_home) select_speed = maxspeed;
   }
   else {
     //SPIFFS.format();

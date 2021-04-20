@@ -76,6 +76,7 @@ void setspeed(int speed) {
   }
   else m_speed = 5000000;
 }
+
 void find_home(void)
 { if (digitalRead(HOME_SW)) {
     target = counter - maxcounter;
@@ -89,9 +90,12 @@ void setpos(int pos)
 void get_switch(int pos)
 { counter = pos;
 }
-void  hard_stop()
+void  hard_stop(void)
 { target = counter;
   mspeed = targetspeed = 0; setspeed(0);
+}
+void soft_stop(int k)
+{ if (mspeed)  target = counter + ((k * mspeed)/10);
 }
 void  ICACHE_RAM_ATTR hard_stop_home(void)
 { target = counter = 0;
@@ -145,6 +149,8 @@ void setup() {
   pinMode(HOME_SW, INPUT_PULLUP);
   pinMode(FULL_SW, INPUT_PULLUP);
   pinMode(IR_INPUT, INPUT_PULLUP);
+  pinMode( DHTPIN, INPUT_PULLUP);
+ 
   Serial.begin(115200);
   delay(500);
   uint8_t i = 0;

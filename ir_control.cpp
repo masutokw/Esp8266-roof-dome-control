@@ -52,7 +52,7 @@ void ir_read(void)
         ir_state = 1;
         break;
       case OK:
-        
+        soft_stop(15);
         lastpresstime = millis();
         ir_state = 1;
         break;

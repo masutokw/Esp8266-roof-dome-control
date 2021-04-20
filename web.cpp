@@ -4,30 +4,34 @@
 #ifdef DHTTYPE
 #include <DHT.h>
 DHT dht(DHTPIN, DHTTYPE);
+float humidity, temperature;
 #endif
 extern   int target, counter, maxcounter, maxspeed, acceleration, mspeed, lowspeed;
 extern uint32_t truecode;
 void handleconfig(void)
-{ 
-  #ifdef DHTTYPE
-  float humidity, temperature;
-  humidity = dht.readHumidity();
-  temperature = dht.readTemperature();
-  #endif
-  String content =  "<html><head> <meta http-equiv='refresh' content='3'><style>" + String(BUTT) + String(TEXTT) + "</style>" + String(AUTO_SIZE) + " </head><body  bgcolor=\"#000000\" text=\"#FF6000\"><h2>Techo</h2>";
+{
+#ifdef DHTTYPE
+
+if (mspeed==0)  {temperature = dht.readTemperature();
+  humidity = dht.readHumidity();}
+
+#endif
+  String content =  "<html><head> <meta http-equiv='refresh' content='2'><style>" + String(BUTT) + String(TEXTT) + "</style>" + String(AUTO_SIZE) + " </head><body  bgcolor=\"#000000\" text=\"#FF6000\"><h2>Techo</h2>";
   content += "<fieldset style=\"width:15%;border-radius:15px\"><legend>Estado</legend>";
-  content += "<h3>Posicion : " + String(counter) + "  " + String(mspeed) + "</h3>";
- #ifdef DHTTYPE
- content += "<h3>Temperatura : " + String(temperature) + "  " + String(humidity) + "</h3>";
- #endif
-  content += "Techo : " + String(counter > 0 ? "Abierto" : "Cerrado") + "<br>";
-  content += "Home : " + String(digitalRead(HOME_SW)  ? "Abierto" : "Cerrado") + "<br>";
-  content += "End : " + String(digitalRead(FULL_SW)  ? "Abierto" : "Cerrado") + "<br>";
-  content += "Ir code : " + String(truecode) + "<br><table style='width:200px'>";
-  content += "<button onclick=\"location.href='/close?DEST=" + String(maxcounter) + "'\" class=\"button_red\" type=\"button\">Open</button>";
-  content += "<button onclick=\"location.href='/close?DEST=0'\" class=\"button_red\" type=\"button\">Close</button>";
-  content += "<button onclick=\"location.href='/dome'\" class=\"button_red\" type=\"button\">Dome</button>";
-  content += "<button onclick=\"location.href='/open?DEST=" + String(counter) + "'\" class=\"button_red\" type=\"button\">Stop</button></table></fieldset>";
+  content += "<h3>Counter : " + String(counter) + "<br>Speed: " + String(mspeed) + "stp/s</h3>";
+#ifdef DHTTYPE
+  content += "<h3>Temp: " + String(temperature) + "&deg; C <br>Hum: " + String(humidity) + " % </h3>";
+#endif
+  content += "Status: " + String(counter > 0 ? "Open" : "Close") + "<br>";
+  content += "Home : " + String(digitalRead(HOME_SW)  ? "OFF" : "ON") + "<br>";
+  content += "End : " + String(digitalRead(FULL_SW)  ? "OFF" : "ON") + "<br>";
+  content += "IR code : " + String(truecode) + "<br><table style='width:200px'>";
+  content += "<button onclick=\"location.href='/move_to?DEST=" + String(maxcounter) + "'\" class=\"button_red\" type=\"button\">Open</button>";
+  content += "<button onclick=\"location.href='/move_to?DEST=0'\" class=\"button_red\" type=\"button\">Close</button>";
+  content += "<button onclick=\"location.href='/home'\" class=\"button_red\" type=\"button\">Dome</button>";
+  content += "<button onclick=\"location.href='/stop?SOFT=15'\" class=\"button_red\" type=\"button\">stop</button>";
+  content += "<button onclick=\"location.href='/stop'\" class=\"button_red\" type=\"button\">PANIC!</button>";
+  content += "<button onclick=\"location.href='/home'\" class=\"button_red\" type=\"button\">Find Home</button></table></fieldset>";
   content += "<fieldset style=\"width:15%;border-radius:15px\"><legend>Tools</legend>";
   content += "<button onclick=\"location.href='/config'\" class=\"button_red\" type=\"button\">Config</button>";
   content += "<button onclick=\"location.href='/netcfg'\" class=\"button_red\" type=\"button\">Network</button>";
@@ -36,23 +40,32 @@ void handleconfig(void)
   content += "</body></html>";
   serverweb.send(200, "text/html", content);
 }
-void handleOpen(void)
+void handleHome(void)
 {
-  // if (mspeed < 0)
-  //   target = counter - (3 * (mspeed));
-  // else
-  //target = counter ;
-  //hard_stop();
-  // counter=0;
   find_home();
   String content =  "<html><head> <meta http-equiv='refresh' content=\"1;url=/\"><style>" + String(BUTT) + String(TEXTT) + "</style>" + String(AUTO_SIZE) + "</head><body  bgcolor=\"#000000\" text=\"#FF6000\"><h2>Apertura</h2><br>";
-  content += "Estado : " + String(target) + "<br>";
-  content += "<button onclick=\"location.href='/close'\" class=\"button_red\" type=\"button\">close</button><br><br>";
+  content += "Status : " + String(target) + "<br>";
+  content += "<button onclick=\"location.href='/'\" class=\"button_red\" type=\"button\">close</button><br><br>";
   content += "</body></html>";
 
   serverweb.send(200, "text/html", content);
 }
-void handleClose(void)
+void handleStop(void)
+{ if (serverweb.hasArg("SOFT")) {
+    String net = serverweb.arg("SOFT");
+    int k = net.toInt();
+    soft_stop(k);
+  } else
+    hard_stop();
+
+  String content =  "<html><head> <meta http-equiv='refresh' content=\"1;url=/\"><style>" + String(BUTT) + String(TEXTT) + "</style>" + String(AUTO_SIZE) + "</head><body  bgcolor=\"#000000\" text=\"#FF6000\"><h2>Apertura</h2><br>";
+  content += "Estado : " + String(target) + "<br>";
+  content += "<button onclick=\"location.href='/'\" class=\"button_red\" type=\"button\">close</button><br><br>";
+  content += "</body></html>";
+
+  serverweb.send(200, "text/html", content);
+}
+void handleMove(void)
 { if (serverweb.hasArg("DEST")) {
     String net = serverweb.arg("DEST");
     target = net.toInt();
@@ -198,16 +211,20 @@ void initwebserver(void)
 
 {
   serverweb.on("/", handleconfig);
-  serverweb.on("/open", handleOpen);
-  serverweb.on("/close", handleClose);
+  serverweb.on("/home", handleHome);
+  serverweb.on("/move_to", handleMove);
   serverweb.on("/dome", handleDome);
   serverweb.on("/netcfg", handleNetwork);
   serverweb.on("/config", handleConf);
   serverweb.on("/restart", handleRestart);
+  serverweb.on("/stop", handleStop);
   serverweb.onNotFound([]()
   {
     if (!handleFileRead(serverweb.uri()))
       serverweb.send(404, "text/plain", "FileNotFound");
   });
   serverweb.begin();
+ #ifdef DHTTYPE
+   dht.begin();
+ #endif 
 }
