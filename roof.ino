@@ -96,6 +96,8 @@ void  hard_stop(void)
 }
 void soft_stop(int k)
 { if (mspeed)  target = counter + ((k * mspeed)/10);
+ if (target<0) target=0; else
+ if (target>maxcounter) target=maxcounter;
 }
 void  ICACHE_RAM_ATTR hard_stop_home(void)
 { target = counter = 0;

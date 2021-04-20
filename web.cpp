@@ -28,7 +28,7 @@ if (mspeed==0)  {temperature = dht.readTemperature();
   content += "IR code : " + String(truecode) + "<br><table style='width:200px'>";
   content += "<button onclick=\"location.href='/move_to?DEST=" + String(maxcounter) + "'\" class=\"button_red\" type=\"button\">Open</button>";
   content += "<button onclick=\"location.href='/move_to?DEST=0'\" class=\"button_red\" type=\"button\">Close</button>";
-  content += "<button onclick=\"location.href='/home'\" class=\"button_red\" type=\"button\">Dome</button>";
+  content += "<button onclick=\"location.href='/dome'\" class=\"button_red\" type=\"button\">Dome</button>";
   content += "<button onclick=\"location.href='/stop?SOFT=15'\" class=\"button_red\" type=\"button\">stop</button>";
   content += "<button onclick=\"location.href='/stop'\" class=\"button_red\" type=\"button\">PANIC!</button>";
   content += "<button onclick=\"location.href='/home'\" class=\"button_red\" type=\"button\">Find Home</button></table></fieldset>";

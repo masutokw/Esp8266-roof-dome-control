@@ -62,7 +62,7 @@ void ir_read(void)
         ir_state = 1;
         break; ;
       case OPEN:
-        target=10000;
+        target=maxcounter;
         lastpresstime = millis();
         ir_state = 1;
         break;
